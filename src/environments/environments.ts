@@ -1,5 +1,0 @@
-export const environment = {
-  production: false,
-  supabaseUrl: 'https://dswakzcxymsbalttunzq.supabase.co',
-  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzd2FremN4eW1zYmFsdHR1bnpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkwMTgxMDUsImV4cCI6MjA3NDU5NDEwNX0.7WTew5J7LcaJy0OIs6AgxsUvXr-aVDGcb-VCy364TL4',
-};
