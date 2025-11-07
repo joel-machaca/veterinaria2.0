@@ -1,0 +1,121 @@
+
+<div class="mb-10 pt-4 sm:pt-6">
+  <div class="text-center max-w-2xl mx-auto">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-3">
+      Mascotas
+    </h1>
+  </div>
+</div>
+
+
+@if (cargando) {
+  <div class="flex justify-center items-center h-64">
+    <div class="text-center">
+      <div class="inline-block animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-cyan-600 mb-4"></div>
+      <p class="text-gray-600 font-medium">Cargando tus compañeros peludos...</p>
+    </div>
+  </div>
+}
+
+
+@if (error) {
+  <div class="max-w-md mx-auto text-center py-12">
+    <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-red-100 mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 0h13.856M4 15l8-8 8 8" />
+      </svg>
+    </div>
+    <h3 class="text-lg font-semibold text-gray-800">Algo salió mal</h3>
+    <p class="text-red-600 mt-2">{{ error }}</p>
+  </div>
+}
+
+
+@if (!cargando && !error) {
+  @if (mascotas && mascotas.length > 0) {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (mascota of mascotas; track mascota.id) {
+        <div
+          class="bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+          [class.border-blue-200]="mascota.sexo === 'macho'"
+          [class.border-pink-200]="mascota.sexo === 'hembra'"
+        >
+          <div
+            class="h-2"
+            [class.bg-blue-500]="mascota.sexo === 'macho'"
+            [class.bg-pink-400]="mascota.sexo === 'hembra'"
+          ></div>
+
+          <div class="p-5">
+            <div class="flex items-start gap-4">
+              <div
+                class="w-14 h-14 rounded-xl flex items-center justify-center shrink-0"
+                [class.bg-blue-100]="mascota.sexo === 'macho'"
+                [class.bg-pink-100]="mascota.sexo === 'hembra'"
+              >
+                @if (mascota.sexo === 'macho') {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l-2.25 2.25m-1.5-1.5l.525-.525M9.75 9.75l2.25 2.25m-1.5-1.5l-.525.525m7.875-5.55l-4.724 4.724M15.75 21V12.75" />
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a8.25 8.25 0 1 0-16.5 0V12c0 .278.077.545.214.783A1.5 1.5 0 0 0 6 12.75h12A1.5 1.5 0 0 0 17.786 12.783C17.649 12.545 17.572 12.278 17.572 12V9.75M12 9v3.75" />
+                  </svg>
+                }
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-bold text-gray-800 truncate">{{ mascota.nombre }}</h3>
+                <p class="text-sm text-gray-600">{{ mascota.especie }}</p>
+              </div>
+            </div>
+
+            <div class="mt-5 space-y-3 text-sm">
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-700">Sexo</span>
+                <span
+                  [class.text-blue-600]="mascota.sexo === 'macho'"
+                  [class.text-pink-600]="mascota.sexo === 'hembra'"
+                  class="font-medium"
+                >
+                  {{ mascota.sexo === 'macho' ? 'Macho' : mascota.sexo === 'hembra' ? 'Hembra' : '—' }}
+                </span>
+              </div>
+
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-700">Nacimiento</span>
+                <span class="text-gray-900">{{ mascota.fechaNacimiento || '—' }}</span>
+              </div>
+
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-700">Dueño</span>
+                <span class="text-gray-900 truncate">{{ mascota.nombreDueno || '—' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="max-w-lg mx-auto text-center py-16 px-4">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-linear-to-br from-blue-100 to-cyan-100 mb-5">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0-7.38-5.07-10.5-12.72-10.5C2.88 0 0 4.12 0 10.5c0 7.38 5.07 10.5 12.72 10.5C21.12 21 24 16.88 24 10.5z" />
+        </svg>
+      </div>
+      <h3 class="text-xl font-bold text-gray-800">No tienes mascotas registradas</h3>
+      <p class="text-gray-600 mt-2 mb-6">
+        Registra a tus primeros amigos peludos y gestiona su cuidado con facilidad.
+      </p>
+      <button
+        class="inline-flex items-center gap-2 bg-linear-to-r from-cyan-600 to-blue-600 text-white px-5 py-2.5 rounded-xl font-medium shadow-md hover:shadow-lg transition"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Registrar mascota
+      </button>
+    </div>
+  }
+}

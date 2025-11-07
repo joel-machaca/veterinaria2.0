@@ -1,59 +1,66 @@
-# Veterinaria20
+# Aplicación Web Clínica Veterinaria
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.5.
+Este proyecto es una **aplicación web desarrollada en Angular** para digitalizar el proceso de atención de una clínica veterinaria. Permite registrar mascotas, agendar citas, consultar el historial de atención y gestionar el estado de las mismas de forma intuitiva y escalable.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🔹 Funcionalidades
+
+1. **Registro de mascotas y dueños**  
+   - Formularios validados con ReactiveForms.  
+   - Captura de información como nombre, especie, sexo, fecha de nacimiento y notas.
+
+2. **Agenda de citas**  
+   - Visualización de citas en lista o calendario.  
+   - Registro de nuevas citas, asignación de hora y estado (pendiente, completada, cancelada).  
+   - Citas próximas resaltadas mediante directivas personalizadas.
+
+3. **Historial de atención por mascota**  
+   - Consulta rápida de todas las citas pasadas de cada mascota.  
+   - Información completa sobre fecha, servicio y detalle de la atención.
+
+4. **Pipes personalizados**  
+   - `appFechaFormato`: formatea fechas a `día / mes / año`.  
+   - `edad`: calcula la edad de cada mascota en años.  
+
+5. **Directivas personalizadas**  
+   - Resaltan citas próximas, cambian colores según estado, mejorando la experiencia del usuario.
+
+6. **Diseño responsivo y moderno**  
+   - Utiliza Tailwind CSS para estilos.  
+   - Compatible con dispositivos móviles y escritorio.  
+
+---
+
+## 🔹 Tecnologías
+
+- **Frontend:** Angular 15+  
+- **Lenguaje:** TypeScript  
+- **Estilos:** Tailwind CSS  
+- **Control de estado y formularios:** ReactiveForms  
+- **Gestión de dependencias:** NPM  
+- **Repositorio:** GitHub
+
+---
+
+## 🔹 Arquitectura del proyecto
+
+- `src/app`  
+  - `mascotas/` → componentes y servicios relacionados con mascotas  
+  - `citas/` → componentes y servicios para la gestión de citas  
+  - `shared/` → pipes, directivas y componentes reutilizables  
+  - `auth/` → manejo de usuarios y autenticación  
+  - `core/models/` → interfaces y modelos de datos  
+  - `core/services/` → servicios para consumir y manipular datos  
+
+- Uso de **arquitectura modular**, separación por dominios y componentes reutilizables.
+
+---
+
+## 🔹 Instalación
+
+1. Clonar el repositorio:
 
 ```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+git clone https://github.com/tu-usuario/clinica-veterinaria.git
+cd clinica-veterinaria
