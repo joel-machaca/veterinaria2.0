@@ -60,13 +60,13 @@ Este proyecto es una **aplicación web desarrollada en Angular** para digitaliza
 
 ** FRONTEND **
 ```bash
-git clone https://github.com/tu-usuario/clinica-veterinaria.git
-cd clinica-veterinaria
+git clone https://github.com/joel-machaca/veterinaria2.0.git
+cd veterinaria2.0
 ```
 ** BACKEND **
 ```bash
-git clone https://github.com/tu-usuario/clinica-veterinaria.git
-cd clinica-veterinaria
+git clone https://github.com/joel-machaca/backend-veterinaria.git
+cd backend-veterinaria
 ```
 
 2. Backend — Spring Boot
