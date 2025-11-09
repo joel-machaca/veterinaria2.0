@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import Swal from 'sweetalert2';
-import { Mascota, Sexo } from '../../../../core/models/mascota';
-import { PetsService } from '../../../../core/services/mascotaService';
-import { AuthService } from '../../../../core/services/authService';
+import { Mascota, Sexo } from '../../../../core/models/mascotas/mascota';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { PetsService } from '../../../../core/services/mascotaService';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-pets-form',
@@ -19,36 +19,40 @@ export class PetsForm {
     fecha_nacimiento: new FormControl('')
   });
 
-  constructor(private pets: PetsService, private auth: AuthService) {}
+  constructor(
+    private petsService: PetsService,
+    private router: Router
+  ) {}
 
-  registrarMascota() {
-    if (this.form.invalid) {
-      Swal.fire('Campos incompletos', 'Completa todos los campos obligatorios.', 'warning');
+  guardarMascota() {
+    if (this.form.invalid) return;
+
+    const duenoId = Number(localStorage.getItem('duenoId'));  
+    if (!duenoId) {
+      alert('No se encontró el ID del dueño logueado');
       return;
     }
-
-    const usuario = this.auth.obtenerUsuario();
-    if (!usuario) {
-      Swal.fire('Error', 'No se encontró la sesión del usuario.', 'error');
-      return;
-    }
-
-    const formData = this.form.getRawValue();
 
     const mascota: Mascota = {
-      duenoId: usuario.id!,
-      nombre: formData.nombre!,
-      especie: formData.especie!,
-      sexo: formData.sexo!,
-      fechaNacimiento: formData.fecha_nacimiento!
+      duenoId,
+      nombre: this.form.value.nombre!,
+      especie: this.form.value.especie!,
+      sexo: this.form.value.sexo!,
+      fechaNacimiento: this.form.value.fecha_nacimiento!
     };
-    console.log(mascota)
-    this.pets.registrarMascota(mascota).subscribe({
-      next: () => Swal.fire('Registro exitoso', 'Mascota registrada correctamente.', 'success'),
-      error: (err) => {
+
+    this.petsService.crearMascota(mascota).subscribe({
+      next: () => {
+        alert('Mascota registrada con éxito 🐶');
+        this.router.navigate(['/cliente/mascotas']); 
+      },
+      error: err => {
         console.error(err);
-        Swal.fire('Error', 'No se pudo registrar la mascota.', 'error');
+        alert('Error al registrar la mascota');
       }
     });
+  }
+  volver(){
+    this.router.navigate(['cliente/mascota'])
   }
 }

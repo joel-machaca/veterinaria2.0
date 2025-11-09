@@ -1,30 +1,42 @@
 import { CommonModule } from '@angular/common';
 
 import { Component, OnInit } from '@angular/core';
-import { Mascota } from '../../../../core/models/mascota';
+
 import { AuthService } from '../../../../core/services/authService';
 import { PetsService } from '../../../../core/services/mascotaService';
-import { EdadPipe } from '../../../../shared/pipes/edad-pipe';
+
+import { Router, RouterModule } from '@angular/router';
 
 
 @Component({
   selector: 'app-pets-list',
-  imports: [CommonModule,EdadPipe],
+  imports: [CommonModule],
   templateUrl: './petsList.html',
   styleUrls: ['./petsList.css'],
 })
-export class PetsList implements OnInit{
-  mascotas: Mascota[] = [];
+export class PetsList {
+  mascotas: any[] = [];
+  duenoId!: number;
 
-  constructor(private pets: PetsService, private auth: AuthService) {}
+  constructor(
+    private petsService: PetsService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    const usuario = this.auth.obtenerUsuario();
-    if (usuario) {
-      this.pets.listarPorDueno(usuario.id!).subscribe({
-        next: (data) => (this.mascotas = data),
-        error: (err) => console.error('Error al obtener mascotas', err)
+    const usuario = this.authService.obtenerUsuario();
+    this.duenoId = usuario?.id!;
+
+    if (this.duenoId) {
+      this.petsService.listarPorDueno(this.duenoId).subscribe({
+        next: (res) => this.mascotas = res,
+        error: (err) => console.error('Error al listar mascotas', err)
       });
     }
+  }
+
+  verCitasMascota(id: number) {
+    this.router.navigate(['/cliente/mascota', id, 'citas']);
   }
 }

@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 
-import {ReactiveFormsModule } from '@angular/forms';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { CommonModule } from '@angular/common';
-import { CitaDto } from '../../../core/models/citaDto';
-import { Cita, EstadoCita } from '../../../core/models/cita';
+import { CitaEstadoUpdateDto } from '../../../core/models/cita/citaEstadoUpdate';
+import { CitaDiagnosticoUpdateDto } from '../../../core/models/cita/citaDiagnosticoUpdateDto';
+import { CitaResumenDto } from '../../../core/models/cita/citaResumenDto';
 import { CitaService } from '../../../core/services/citaService';
+import { TipoEstado } from '../../../core/models/cita/citaBase';
 import { FechaFormatoPipe } from '../../../shared/pipes/fechaFormato-pipe';
 
 @Component({
@@ -15,49 +17,74 @@ import { FechaFormatoPipe } from '../../../shared/pipes/fechaFormato-pipe';
   styleUrl: './citasAdmin.css',
 })
 export class CitasAdmin {
-  estadocita=EstadoCita
-  citas: CitaDto[] = [];
-  cargando: boolean = false;
-  error: string = '';
+  estados=TipoEstado
+  citas: CitaResumenDto[] = [];
+  mostrarModal = false;
+  citaSeleccionadaId: number | null = null;
+
+  formDiagnostico = new FormGroup({
+    diagnostico: new FormControl('', Validators.required)
+  });
 
   constructor(private citaService: CitaService) {}
 
   ngOnInit(): void {
-    this.listarCitas();
+    this.cargarCitas();
   }
 
-  listarCitas(): void {
-    this.cargando = true;
-    this.citaService.listarTodas().subscribe({
-      next: data => {
-        this.citas = data;
-        this.cargando = false;
+  cargarCitas() {
+    this.citaService.listarCitasResumen().subscribe({
+      next: (data) => {
+        this.citas = data.filter(c =>
+          c.estado === TipoEstado.pendiente || c.estado === TipoEstado.confirmada
+        );
       },
-      error: err => {
-        this.error = 'Error al cargar las citas';
-        console.error(err);
-        this.cargando = false;
-      }
+      error: (err) => console.error(err)
     });
   }
 
-  marcarCompletada(cita: CitaDto): void {
-    if (!cita.id) return;
-    this.citaService.actualizarEstado(cita.id, 'completada').subscribe({
-      next: () => {
-        cita.estado = EstadoCita.completada;
-      },
-      error: err => console.error('Error al completar la cita', err)
+  actualizarEstado(id: number, nuevoEstado: TipoEstado) {
+    const dto: CitaEstadoUpdateDto = { id, estado: nuevoEstado };
+    this.citaService.actualizarEstado(dto).subscribe({
+      next: () => this.cargarCitas(),
+      error: (err) => console.error(err)
     });
   }
 
-  cancelarCita(cita: CitaDto): void {
-    if (!cita.id) return;
-    this.citaService.actualizarEstado(cita.id, 'cancelada').subscribe({
+  abrirModalCompletar(id: number) {
+    this.citaSeleccionadaId = id;
+    this.mostrarModal = true;
+    this.formDiagnostico.reset();
+  }
+
+  cerrarModal() {
+    this.mostrarModal = false;
+    this.citaSeleccionadaId = null;
+  }
+
+  completarCita() {
+    if (this.formDiagnostico.invalid || !this.citaSeleccionadaId) return;
+
+    const diagnosticoDto: CitaDiagnosticoUpdateDto = {
+      id: this.citaSeleccionadaId,
+      diagnostico: this.formDiagnostico.value.diagnostico || ''
+    };
+
+    this.citaService.actualizarDiagnostico(diagnosticoDto).subscribe({
       next: () => {
-        cita.estado = EstadoCita.cancelada;
+        const estadoDto: CitaEstadoUpdateDto = {
+          id: this.citaSeleccionadaId!,
+          estado: TipoEstado.completada
+        };
+        this.citaService.actualizarEstado(estadoDto).subscribe({
+          next: () => {
+            this.cerrarModal();
+            this.cargarCitas();
+          },
+          error: (err) => console.error(err)
+        });
       },
-      error: err => console.error('Error al cancelar la cita', err)
+      error: (err) => console.error(err)
     });
   }
 }

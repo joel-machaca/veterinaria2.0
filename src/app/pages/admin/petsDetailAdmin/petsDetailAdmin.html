@@ -1,0 +1,150 @@
+<div class="min-h-screen bg-gray-50 py-12 px-6">
+  <div class="container mx-auto max-w-5xl">
+
+
+    <div class="text-center mb-12">
+      <h2 class="text-5xl font-extrabold text-gray-800">
+        Detalle de Mascota
+      </h2>
+    </div>
+
+
+    <div *ngIf="loading" class="flex justify-center py-32">
+      <div class="inline-flex items-center gap-4 bg-white rounded-2xl shadow-lg px-10 py-6 border border-gray-200">
+        <div class="w-10 h-10 border-4 border-cyan-600 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-xl font-medium text-gray-700">Cargando perfil...</p>
+      </div>
+    </div>
+
+
+    <div *ngIf="!loading && detalle" class="space-y-10">
+      <div class="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
+        <div class="bg-linear-to-r from-gray-600 to-gray-700 px-10 py-12 text-white"
+        [ngClass]="{
+          'from-cyan-400 to-cyan-700':detalle.mascota.sexo==='macho',
+          'from-rose-400 to-rose-700':detalle.mascota.sexo==='hembra'
+        }">
+          <div class="flex flex-col md:flex-row items-center gap-10">
+            <div class="relative">
+              <div class="w-36 h-36 bg-white rounded-full flex items-center justify-center text-cyan-600 text-8xl font-extrabold shadow-2xl ring-8 ring-white/30"
+              [ngClass]="{
+          ' text-cyan-400':detalle.mascota.sexo==='macho',
+          ' text-rose-400':detalle.mascota.sexo==='hembra'
+        }">
+                {{ detalle.mascota.nombre.charAt(0).toUpperCase() }}
+              </div>
+            </div>
+            <div class="text-center md:text-left">
+              <h3 class="text-5xl font-extrabold mb-3">{{ detalle.mascota.nombre }}</h3>
+              <div class="flex flex-wrap gap-6 text-lg opacity-90">
+                <span>{{ detalle.mascota.especie | titlecase }}</span>
+                <span>•</span>
+                <span>{{ detalle.mascota.sexo | titlecase }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-10 bg-gray-50">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-lg">
+            <div>
+              <p class="text-gray-600 font-medium">Fecha de nacimiento</p>
+              <p class="font-bold text-gray-900 text-xl">
+                {{ detalle.mascota.fechaNacimiento }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl shadow-lg border border-gray-200 p-10">
+        <h3 class="text-2xl font-bold text-gray-800 mb-8 flex items-center gap-4">
+          <div class="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center text-white font-bold">U</div>
+          Información del Dueño
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-lg">
+          <div>
+            <p class="text-gray-600 text-sm font-medium">Nombre completo</p>
+            <p class="font-bold text-gray-900 mt-1">
+              {{ detalle.dueno.nombre }} {{ detalle.dueno.apellido }}
+            </p>
+          </div>
+          <div>
+            <p class="text-gray-600 text-sm font-medium">Email</p>
+            <p class="text-gray-800 mt-1">{{ detalle.dueno.email }}</p>
+          </div>
+          <div>
+            <p class="text-gray-600 text-sm font-medium">Teléfono</p>
+            <p class="text-gray-800 mt-1">{{ detalle.dueno.telefono }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl shadow-lg border border-gray-200 p-10">
+        <h3 class="text-2xl font-bold text-gray-800 mb-8 text-center">
+          Citas Completadas
+        </h3>
+
+        <div *ngIf="detalle.citas.length" class="overflow-x-auto">
+          <table class="w-full min-w-[640px]">
+            <thead class="bg-gray-900 text-white">
+              <tr>
+                <th class="px-6 py-4 text-left font-medium">Servicio</th>
+                <th class="px-6 py-4 text-left font-medium">Fecha</th>
+                <th class="px-6 py-4 text-left font-medium">Hora</th>
+                <th class="px-6 py-4 text-left font-medium">Diagnóstico</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr *ngFor="let c of detalle.citas" class="hover:bg-gray-50 transition">
+                <td class="px-6 py-5 font-medium text-gray-900">
+                  {{ c.servicio }}
+                </td>
+                <td class="px-6 py-5">
+                  <div>
+                    <span class="text-xl font-bold text-cyan-700">
+                      {{ c.fecha | appFechaFormato:'dia' }}
+                    </span>
+                    <span class="text-cyan-600 font-medium ml-2">
+                      {{ c.fecha | appFechaFormato:'mes' | slice:0:3 | uppercase }}
+                    </span>
+                    <span class="text-gray-600 ml-2">
+                      {{ c.fecha | appFechaFormato:'anio' }}
+                    </span>
+                  </div>
+                </td>
+                <td class="px-6 py-5 font-semibold text-gray-800">
+                  {{ c.hora }}
+                </td>
+                <td class="px-6 py-5 text-gray-700 max-w-md">
+                  <p class="line-clamp-2">
+                    {{ c.diagnostico || 'Sin diagnóstico registrado' }}
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div *ngIf="!detalle.citas.length" class="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300">
+          <p class="text-2xl font-medium text-gray-600">
+            No tiene citas completadas
+          </p>
+          <p class="text-gray-500 mt-3">
+            Las consultas aparecerán aquí cuando se completen
+          </p>
+        </div>
+      </div>
+
+      <div class="text-center pt-8">
+        <button 
+          (click)="volver()"
+          class="inline-flex items-center gap-3 px-12 py-5 bg-gray-900 hover:bg-cyan-600 text-white font-bold text-lg rounded-2xl shadow-xl transition-all duration-300 transform hover:scale-105"
+        >
+          Back Volver al listado
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

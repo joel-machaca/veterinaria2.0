@@ -30,9 +30,9 @@ export class Login {
     this.auth.login(email!, password!).subscribe({
       next: (perfil) => {
         this.auth.guardarSesion(perfil);
-
+        localStorage.setItem('duenoId', perfil.id!.toString());
         let destino = '/';
-        if (perfil.rol === Rol.admin) {
+        if (perfil.rol === Rol.admin) {  
           destino = '/admin/mascotas'; 
         } else if (perfil.rol === Rol.cliente) {
           destino = '/cliente/mascotas'; 

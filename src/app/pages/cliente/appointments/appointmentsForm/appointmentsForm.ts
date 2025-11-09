@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import Swal from 'sweetalert2';
-import { Cita, EstadoCita, Servicio } from '../../../../core/models/cita';
 
-import { AuthService } from '../../../../core/services/authService';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { PetsService } from '../../../../core/services/mascotaService';
-import { Mascota } from '../../../../core/models/mascota';
 import { CitaService } from '../../../../core/services/citaService';
+import { AuthService } from '../../../../core/services/authService';
+import { CitaDto } from '../../../../core/models/cita/citaDto';
+import { PetsService } from '../../../../core/services/mascotaService';
+import { TipoServicio } from '../../../../core/models/cita/citaBase';
+
 
 @Component({
   selector: 'app-appointments-form',
@@ -16,71 +16,66 @@ import { CitaService } from '../../../../core/services/citaService';
   styleUrl: './appointmentsForm.css',
 })
 export class AppointmentsForm {
-  horasDisponibles: string[] = [];
-  mascotas: Mascota[] = [];
-  mascotaSeleccionada?: Mascota;
-  serviciosCita=Object.values(Servicio)
-
-  form = new FormGroup({
-    mascotaId: new FormControl<number | null>(null, Validators.required),
-    servicio:new FormControl('',Validators.required),
-    fecha: new FormControl('', Validators.required),
-    hora: new FormControl('', Validators.required),
-    detalle: new FormControl('')
-  });
+  form!: FormGroup;
+  mascotas: any[] = [];
+  mascotaSeleccionada: any = null;
+  horasDisponibles = ['08:00:00','09:00:00', '10:00:00', '11:00:00','14:00:00', '15:00:00', '16:00:00','17:00:00','18:00:00',];
+  serviciosCita = Object.values(TipoServicio);
 
   constructor(
-    private citas: CitaService,
-    private auth: AuthService,
-    private pets: PetsService
-  ) {
-    for (let h = 8; h <= 18; h++) {
-      this.horasDisponibles.push(`${h.toString().padStart(2, '0')}:00:00`);
+    private fb: FormBuilder,
+    private citaService: CitaService,
+    private authService: AuthService,
+    private petsService:PetsService
+  ) {}
+
+  ngOnInit() {
+    const usuario = this.authService.obtenerUsuario();
+    const duenoId = usuario?.id; 
+
+    this.form = this.fb.group({
+      mascotaId: ['', Validators.required],
+      duenoId: [duenoId, Validators.required],
+      servicio: ['', Validators.required],
+      fecha: ['', Validators.required],
+      hora: ['', Validators.required],
+      detalle: ['', Validators.required],
+      diagnostico: [''],
+      estado: ['pendiente']
+    });
+
+    if (duenoId) {
+      this.cargarMascotas(duenoId);
     }
   }
 
-  ngOnInit() {
-    const usuario = this.auth.obtenerUsuario();
-    if (usuario) {
-      this.pets.listarPorDueno(usuario.id!).subscribe({
-        next: (mascotas) => (this.mascotas = mascotas),
-        error: (err) => console.error('Error al cargar mascotas', err)
-      });
-    }
+  cargarMascotas(duenoId: number) {
+    this.petsService.listarPorDueno(duenoId).subscribe({
+      next: (res) => {
+        this.mascotas = res;
+      },
+      error: (err) => {
+        console.error('Error al cargar mascotas', err);
+      }
+    });
   }
 
   onMascotaChange(id: number) {
-    this.mascotaSeleccionada = this.mascotas.find(m => m.id === +id);
+    this.mascotaSeleccionada = this.mascotas.find(m => m.id == id);
   }
 
   registrarCita() {
-    if (this.form.invalid) {
-      Swal.fire('Campos incompletos', 'Completa todos los campos obligatorios.', 'warning');
-      return;
-    }
+    if (this.form.invalid) return;
 
-    const usuario = this.auth.obtenerUsuario();
-    if (!usuario) {
-      Swal.fire('Error', 'No se encontró la sesión del usuario.', 'error');
-      return;
-    }
-
-    const data = this.form.getRawValue();
-    const cita: Cita = {
-      duenoId: usuario.id!,
-      mascotaId: Number(data.mascotaId!),
-      servicio:data.servicio as Servicio,
-      fecha: data.fecha!,
-      hora: data.hora!,
-      detalle: data.detalle || '',
-      estado: EstadoCita.pendiente
-    };
-    console.log(cita)
-    this.citas.registrarCita(cita).subscribe({
-      next: () => Swal.fire('Cita registrada', 'Tu cita ha sido registrada exitosamente.', 'success'),
-      error: (err) => {
+    const cita: CitaDto = this.form.value;
+    this.citaService.crearCita(cita).subscribe({
+      next: res => {
+        alert('✅ Cita registrada correctamente');
+        this.form.reset();
+      },
+      error: err => {
         console.error(err);
-        Swal.fire('Error', 'No se pudo registrar la cita.', 'error');
+        alert('❌ Error al registrar la cita');
       }
     });
   }

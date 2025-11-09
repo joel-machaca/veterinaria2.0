@@ -1,33 +1,111 @@
-<div class="min-h-screen bg-gray-50 p-6 sm:p-10">
-  <div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
-    <h1 class="text-3xl font-extrabold text-blue-900 mb-6">Mis Citas</h1>
+<div class="min-h-screen bg-gray-50 py-12 px-6">
+  <div class="max-w-4xl mx-auto">
 
-    @if (cargando) {
-        <div class="text-center py-10 text-gray-500">
-      Cargando citas...
-    </div>
-    }
-    @if (!cargando && citas.length === 0) {
-        <div class="text-center py-10 text-gray-500">
-      No tienes citas registradas.
-    </div>
-    }
-    
+    <h2 class="text-4xl font-bold text-gray-800 text-center mb-12">
+      Mis Citas
+    </h2>
 
-    @if (!cargando && citas.length > 0) {
-        <div class="space-y-4">
-            @for (cita of citas; track cita.id) {
-                <div class="p-4 border rounded-xl shadow-sm flex justify-between items-center">
-        <div>
-          <p class="font-semibold text-gray-800">{{ cita.mascotaId }} - {{ cita.detalle || 'Sin detalle' }}</p>
-          <p class="text-gray-500 text-sm">Fecha: {{ cita.fecha }} | Hora: {{ cita.hora }}</p>
+    <div *ngIf="cargando" class="text-center py-20">
+      <p class="text-xl text-gray-600">Cargando citas...</p>
+    </div>
+
+    <div *ngIf="!cargando && citas.length === 0" class="text-center py-20">
+      <p class="text-lg text-gray-600">No tienes citas registradas.</p>
+    </div>
+
+    <div *ngIf="!cargando && citas.length > 0" class="space-y-8">
+      <div
+        *ngFor="let cita of citas"
+        class="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow p-8 border border-gray-100"
+      >
+        <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
+          <div class="flex-1">
+            <h3 class="text-2xl font-bold text-gray-800">
+              {{ cita.nombreMascota }}
+            </h3>
+            <p class="text-gray-600 mt-1 text-lg">
+              {{ cita.servicio }}
+            </p>
+            <p class="text-gray-500 mt-3">
+              {{ cita.fecha | appFechaFormato:'dia' }} {{ cita.fecha | appFechaFormato:'mes' | titlecase }} 
+              {{ cita.fecha | appFechaFormato:'anio' }} - {{ cita.hora }} 
+              <span class="ml-3 font-medium"
+                    [class.text-green-600]="cita.estado === estadoCita.confirmada"
+                    [class.text-yellow-600]="cita.estado === estadoCita.pendiente"
+                    [class.text-red-600]="cita.estado === estadoCita.cancelada">
+                • {{ cita.estado | titlecase }}
+              </span>
+            </p>
+          </div>
+
+          <button
+            class="bg-cyan-600 hover:bg-cyan-700 text-white font-medium px-6 py-3 rounded-xl transition whitespace-nowrap"
+            (click)="verDetalle(cita.id!)"
+          >
+            Ver Detalle
+          </button>
         </div>
-        <span class="px-3 py-1 rounded-full text-sm font-semibold" [ngClass]="estadoClase(cita.estado)">
-          {{ cita.estado }}
-        </span>
       </div>
-            }
     </div>
-    }
+
+    <div *ngIf="citaSeleccionada" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-screen overflow-y-auto">
+        <div class="p-8">
+          <div class="flex justify-between items-start mb-8">
+            <h3 class="text-2xl font-bold text-gray-800">
+              Detalle de la Cita
+            </h3>
+            <button
+              (click)="cerrarModal()"
+              class="text-gray-500 hover:text-gray-800 text-2xl"
+            >
+              X
+            </button>
+          </div>
+
+          <div class="space-y-6 text-gray-700">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <p><strong>Fecha:</strong> {{ citaSeleccionada.fecha | appFechaFormato:'dia' }} {{ citaSeleccionada.fecha | appFechaFormato:'mes' | titlecase }} {{ citaSeleccionada.fecha | appFechaFormato:'anio' }}</p>
+              <p><strong>Hora:</strong> {{ citaSeleccionada.hora }}</p>
+            </div>
+            <p><strong>Detalle:</strong> {{ citaSeleccionada.detalle || 'Sin detalle' }}</p>
+            <p><strong>Estado:</strong> 
+              <span [class.text-green-600]="citaSeleccionada.estado === estadoCita.confirmada"
+                    [class.text-yellow-600]="citaSeleccionada.estado === estadoCita.pendiente"
+                    [class.text-red-600]="citaSeleccionada.estado === estadoCita.cancelada">
+                {{ citaSeleccionada.estado | titlecase }}
+              </span>
+            </p>
+
+            <p *ngIf="citaSeleccionada.diagnostico" class="bg-green-50 p-4 rounded-xl border-l-4 border-green-500">
+              <strong>Diagnóstico:</strong> {{ citaSeleccionada.diagnostico }}
+            </p>
+
+            <hr class="my-6 border-gray-200">
+
+            <div>
+              <p class="font-semibold text-cyan-700 text-lg mb-3">Mascota</p>
+              <div class="grid grid-cols-2 gap-4 text-gray-700">
+                <p>{{ citaSeleccionada.nombreMascota }} ({{ citaSeleccionada.especieMascota }})</p>
+                <p>Sexo: {{ citaSeleccionada.sexoMascota }}</p>
+                <p colspan="2">Nacimiento: {{ citaSeleccionada.fechaNacimiento }}</p>
+              </div>
+            </div>
+
+            <hr class="my-6 border-gray-200">
+
+            <div>
+              <p class="font-semibold text-gray-800 text-lg mb-3">Dueño</p>
+              <div class="space-y-2 text-gray-700">
+                <p>{{ citaSeleccionada.nombreDueno }}</p>
+                <p>Email: {{ citaSeleccionada.emailDueno }}</p>
+                <p>Teléfono: {{ citaSeleccionada.telefonoDueno }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>

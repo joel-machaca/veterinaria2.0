@@ -1,49 +1,60 @@
 import { Component } from '@angular/core';
-import { Cita, EstadoCita } from '../../../../core/models/cita';
-import { AuthService } from '../../../../core/services/authService';
 import { CommonModule } from '@angular/common';
 import { CitaService } from '../../../../core/services/citaService';
+import { AuthService } from '../../../../core/services/authService';
+import { CitaResponseDto } from '../../../../core/models/cita/citaResponseDto';
+import { CitaResumenDto } from '../../../../core/models/cita/citaResumenDto';
+import { TipoEstado } from '../../../../core/models/cita/citaBase';
+import { FechaFormatoPipe } from '../../../../shared/pipes/fechaFormato-pipe';
+
 
 @Component({
   selector: 'app-appointments-list',
-  imports: [CommonModule],
+  imports: [CommonModule,FechaFormatoPipe],
   templateUrl: './appointmentsList.html',
   styleUrl: './appointmentsList.css',
 })
 export class AppointmentsList {
-  citas: Cita[] = [];
-  cargando = true;
+  estadoCita=TipoEstado
+  citas: CitaResumenDto[] = [];
+  citaSeleccionada: CitaResponseDto | null = null;
+  cargando = false;
 
   constructor(
-    private citasService: CitaService,
-    private auth: AuthService
+    private citaService: CitaService,
+    private authService: AuthService
   ) {}
 
-  ngOnInit() {
-    const usuario = this.auth.obtenerUsuario();
-    if (usuario) {
-      this.citasService.listarPorDueno(usuario.id!).subscribe({
-        next: (data) => {
-          this.citas = data;
-          this.cargando = false;
-        },
-        error: (err) => {
-          console.error('Error al cargar citas', err);
-          this.cargando = false;
-        }
-      });
-    } else {
-      this.cargando = false;
+  ngOnInit(): void {
+    const usuario = this.authService.obtenerUsuario();
+    if (usuario?.id) {
+      this.cargarCitas(usuario.id);
     }
   }
 
-  estadoClase(estado: EstadoCita) {
-    switch (estado) {
-      case EstadoCita.pendiente: return 'bg-yellow-100 text-yellow-800';
-      case EstadoCita.confirmada: return 'bg-blue-100 text-blue-800';
-      case EstadoCita.completada: return 'bg-green-100 text-green-800';
-      case EstadoCita.cancelada: return 'bg-red-100 text-red-800';
-      default: return '';
-    }
+  cargarCitas(duenoId: number): void {
+    this.cargando = true;
+    this.citaService.listarCitasResumenPorDueno(duenoId).subscribe({
+      next: (data) => {
+        console.log("cargar citas:",data)
+        this.citas = data;
+        this.cargando = false;
+      },
+      error: () => (this.cargando = false)
+    });
+  }
+
+  verDetalle(id: number): void {
+    this.citaService.obtenerDetalle(id).subscribe({
+      next: (data) => {
+        console.log("cargar citas detalles:",data)
+        this.citaSeleccionada = data;
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  cerrarModal(): void {
+    this.citaSeleccionada = null;
   }
 }

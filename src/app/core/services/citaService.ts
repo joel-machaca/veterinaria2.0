@@ -1,34 +1,54 @@
-import { HttpClient } from '@angular/common/http';
+
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Cita } from '../models/cita';
+import { CitaResponseDto } from '../models/cita/citaResponseDto';
 import { Observable } from 'rxjs';
-import { CitaDto } from '../models/citaDto';
+import { CitaEstadoUpdateDto } from '../models/cita/citaEstadoUpdate';
+import { CitaDiagnosticoUpdateDto } from '../models/cita/citaDiagnosticoUpdateDto';
+import { CitaResumenDto } from '../models/cita/citaResumenDto';
+import { CitaDto } from '../models/cita/citaDto';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class CitaService {
-
   private apiUrl = 'http://localhost:8080/api/citas';
 
   constructor(private http: HttpClient) {}
 
-  registrarCita(cita: Cita): Observable<Cita> {
-    return this.http.post<Cita>(`${this.apiUrl}/registrar`, cita);
+  crearCita(cita: CitaDto): Observable<CitaResponseDto> {
+    return this.http.post<CitaResponseDto>(`${this.apiUrl}`, cita);
   }
 
-  listarPorDueno(duenoId: number): Observable<Cita[]> {
-    return this.http.get<Cita[]>(`${this.apiUrl}?duenoId=${duenoId}`);
+  actualizarCita(id: number, cita: CitaDto): Observable<CitaResponseDto> {
+    return this.http.put<CitaResponseDto>(`${this.apiUrl}/${id}`, cita);
   }
 
-
-
-  actualizarEstado(id: number, estado: string): Observable<CitaDto> {
-    return this.http.patch<CitaDto>(`${this.apiUrl}/${id}/estado?estado=${estado}`, {});
+  actualizarEstado(dto: CitaEstadoUpdateDto): Observable<CitaResponseDto> {
+    return this.http.put<CitaResponseDto>(`${this.apiUrl}/estado`, dto);
   }
 
-  listarTodas(): Observable<CitaDto[]> {
-    return this.http.get<CitaDto[]>(`${this.apiUrl}/todoCita`);
+  actualizarDiagnostico(dto: CitaDiagnosticoUpdateDto): Observable<CitaResponseDto> {
+    return this.http.put<CitaResponseDto>(`${this.apiUrl}/diagnostico`, dto);
   }
 
+  listarCitasResumen(): Observable<CitaResumenDto[]> {
+    return this.http.get<CitaResumenDto[]>(`${this.apiUrl}/resumen`);
+  }
+
+  listarCitasResumenPorDueno(duenoId: number, estados?: string[]): Observable<CitaResumenDto[]> {
+    let params = new HttpParams();
+    if (estados) estados.forEach(e => params = params.append('estado', e));
+    return this.http.get<CitaResumenDto[]>(`${this.apiUrl}/dueno/${duenoId}/resumen`, { params });
+  }
+
+  obtenerDetalle(id: number): Observable<CitaResponseDto> {
+    return this.http.get<CitaResponseDto>(`${this.apiUrl}/${id}`);
+  }
+
+  // 🟢 Listar citas por mascota
+listarCitasPorMascota(mascotaId: number): Observable<CitaResumenDto[]> {
+  return this.http.get<CitaResumenDto[]>(`${this.apiUrl}/mascota/${mascotaId}/resumen`);
+}
 }

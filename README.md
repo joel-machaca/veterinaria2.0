@@ -34,33 +34,77 @@ Este proyecto es una **aplicación web desarrollada en Angular** para digitaliza
 
 ## 🔹 Tecnologías
 
-- **Frontend:** Angular 15+  
-- **Lenguaje:** TypeScript  
-- **Estilos:** Tailwind CSS  
-- **Control de estado y formularios:** ReactiveForms  
-- **Gestión de dependencias:** NPM  
-- **Repositorio:** GitHub
 
+**Frontend**
+- Angular 17+ (v20)
+- TypeScript
+- Tailwind CSS
+- ReactiveForms
+- NPM
+
+**Backend**
+
+- Spring Boot 3+
+
+- Java 17+
+
+- Maven
+
+- PostgreSQL
 ---
 
-## 🔹 Arquitectura del proyecto
-
-- `src/app`  
-  - `mascotas/` → componentes y servicios relacionados con mascotas  
-  - `citas/` → componentes y servicios para la gestión de citas  
-  - `shared/` → pipes, directivas y componentes reutilizables  
-  - `auth/` → manejo de usuarios y autenticación  
-  - `core/models/` → interfaces y modelos de datos  
-  - `core/services/` → servicios para consumir y manipular datos  
-
-- Uso de **arquitectura modular**, separación por dominios y componentes reutilizables.
-
----
 
 ## 🔹 Instalación
 
-1. Clonar el repositorio:
+1. Clonar el repositorio Frontend y backend:
 
+** FRONTEND **
 ```bash
 git clone https://github.com/tu-usuario/clinica-veterinaria.git
 cd clinica-veterinaria
+```
+** BACKEND **
+```bash
+git clone https://github.com/tu-usuario/clinica-veterinaria.git
+cd clinica-veterinaria
+```
+
+2. Backend — Spring Boot
+📦 Requisitos previos
+
+- Java 17 o superior
+
+- Maven 3.8+
+
+Base de datos (opcional, si tu proyecto usa H2, no se necesita instalación)
+
+2.Crear una base de datos en PostgreSQL
+```bash
+CREATE DATABASE veterinaria;
+```
+3. En el archivo aplication.properties, configura tu conexion
+```bash
+spring.datasource.url=jdbc:postgresql://localhost:5432/veterinaria
+spring.datasource.username=postgres
+spring.datasource.password=tu_contraseña
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+server.port=8080
+```
+4. ejecuta el backend (la creacion de las tablas son automaticas)
+
+5. Frontend — Angular
+📦 Requisitos previos
+
+- Node.js 18+
+
+- Angular CLI (npm install -g @angular/cli)
+
+**pasos a ejecutar**
+
+```bash
+cd frontend
+npm install
+ng serve
+```

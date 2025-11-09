@@ -8,7 +8,6 @@ export interface Perfil {
     password?: string;
     telefono?: string;
     rol?: Rol;
-    creadoEn?: string;
 }
 export enum Rol{
     admin='admin',

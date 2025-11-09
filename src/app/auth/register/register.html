@@ -1,5 +1,5 @@
-<div class="flex justify-center items-center min-h-screen bg-gray-50">
-  <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
+<div class="flex justify-center items-center min-h-screen bg-gray-50 my-7">
+  <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
     <h2 class="text-2xl font-bold text-center mb-6">Crear cuenta</h2>
 
     <form [formGroup]="form" (ngSubmit)="registrar()" class="space-y-4">
@@ -55,7 +55,7 @@
 
       <button
         type="submit"
-        class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+        class="w-full bg-cyan-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
         [disabled]="form.invalid"
       >
         Registrarse
@@ -64,7 +64,7 @@
 
     <p class="text-center text-sm text-gray-500 mt-4">
       ¿Ya tienes cuenta?
-      <a routerLink="/login" class="text-green-600 hover:underline">Inicia sesión</a>
+      <a routerLink="/login" class="text-cyan-900 hover:underline">Inicia sesión</a>
     </p>
   </div>
 </div>
